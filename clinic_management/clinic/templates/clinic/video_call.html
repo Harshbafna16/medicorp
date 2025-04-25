@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Call</title>
+    <script src="https://pay.google.com/gp/p/js/pay.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(120deg, #f0f8ff, #d9e4ff);
+            color: #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        video {
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            transform: scale(1);
+            transition: transform 0.3s ease-in-out;
+        }
+        video:hover {
+            transform: scale(1.05);
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #00408a;
+            transform: scale(1.1);
+        }
+        #gpay-button-container {
+            margin-top: 20px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Video Consultation</h1>
+    <video id="localVideo" autoplay playsinline></video>
+    <button onclick="startVideoCall()">Start Video</button>
+    <div id="gpay-button-container"></div>
+
+    <script>
+        function startVideoCall() {
+            navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                .then(stream => {
+                    document.getElementById("localVideo").srcObject = stream;
+                })
+                .catch(error => console.error("Camera access error:", error));
+        }
+
+        const socket = new WebSocket("ws://127.0.0.1:8000/ws/video_call/");
+
+        socket.onopen = function() {
+            console.log("Connected to WebSocket");
+            socket.send(JSON.stringify({ message: "Hello Server!" }));
+        };
+
+        socket.onmessage = function(event) {
+            console.log("Received:", event.data);
+        };
+
+        socket.onclose = function() {
+            console.log("WebSocket Disconnected");
+        };
+
+        function onGooglePayLoaded() {
+            const paymentsClient = new google.payments.api.PaymentsClient({environment: 'TEST'});
+            const paymentRequest = {
+                apiVersion: 2,
+                apiVersionMinor: 0,
+                allowedPaymentMethods: [{
+                    type: "CARD",
+                    parameters: {
+                        allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+                        allowedCardNetworks: ["VISA", "MASTERCARD"]
+                    },
+                    tokenizationSpecification: {
+                        type: "PAYMENT_GATEWAY",
+                        parameters: {
+                            gateway: "example",
+                            gatewayMerchantId: "exampleGatewayMerchantId"
+                        }
+                    }
+                }],
+                merchantInfo: {
+                    merchantId: "01234567890123456789",
+                    merchantName: "Demo Merchant"
+                },
+                transactionInfo: {
+                    totalPriceStatus: "FINAL",
+                    totalPriceLabel: "Total",
+                    totalPrice: "10.00",
+                    currencyCode: "USD",
+                    countryCode: "US"
+                }
+            };
+            const button = paymentsClient.createButton({onClick: () => {
+                paymentsClient.loadPaymentData(paymentRequest)
+                    .then(paymentData => console.log("Payment Success", paymentData))
+                    .catch(error => console.error("Payment Failed", error));
+            }});
+            document.getElementById('gpay-button-container').appendChild(button);
+        }
+    </script>
+    <script async defer src="https://pay.google.com/gp/p/js/pay.js" onload="onGooglePayLoaded()"></script>
+</body>
+</html>

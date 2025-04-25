@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescription</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f8ff;
+            font-family: 'Arial', sans-serif;
+            animation: fadeIn 1s ease-in-out;
+        }
+        .navbar {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+        }
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: bold;
+        }
+        .container {
+            margin-top: 50px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeUp 1s ease-in-out;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .btn-primary {
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media print {
+            .btn, .navbar { display: none; }
+            .container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="#">Clinic Management</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'book_appointment' %}">Book Appointment</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Prescription Details -->
+    <div class="container">
+        <h2 class="text-center text-primary fw-bold">Patient Prescription</h2>
+        <p><strong>Patient Name:</strong> John Doe</p>
+        <p><strong>Date:</strong> March 3, 2025</p>
+
+        <h4 class="mt-4 text-success">Prescribed Medicines</h4>
+        <table class="table table-bordered table-striped">
+            <thead class="table-primary">
+                <tr>
+                    <th>Medicine Name</th>
+                    <th>Dosage</th>
+                    <th>Schedule</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Paracetamol</td>
+                    <td>500mg</td>
+                    <td>Morning & Night</td>
+                    <td>5 Days</td>
+                </tr>
+                <tr>
+                    <td>Amoxicillin</td>
+                    <td>250mg</td>
+                    <td>After Meals</td>
+                    <td>7 Days</td>
+                </tr>
+                <tr>
+                    <td>Vitamin C</td>
+                    <td>1000mg</td>
+                    <td>Once Daily</td>
+                    <td>30 Days</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4 class="mt-4 text-danger">Doctor's Instructions</h4>
+        <ul>
+            <li>Drink plenty of water.</li>
+            <li>Take medicines exactly as prescribed.</li>
+            <li>Avoid spicy food for a week.</li>
+        </ul>
+
+        <!-- Download PDF Button -->
+        <button class="btn btn-primary" onclick="printPrescription()">Download PDF</button>
+
+        <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+    </div>
+
+    <script>
+        function printPrescription() {
+            window.print();
+        }
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
